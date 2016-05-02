@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+<script src="http://cdn.zingchart.com/zingchart.min.js"></script>
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+<style>
+#mapid { height: 480px; }
+section {
+    height: 100px;
+    margin: auto;
+    padding: 10px;
+}
+div#headings {
+    width: 60%;
+    height: 100%;
+    float: left;
+}
+div#controls {
+    background: aqua;
+    float:left;
+    width:20%;
+    height: 100%;
+}
+div#controlscontrol {
+	float:left;
+	width:20%;
+	height: 100%;
+	background: red;
+}
+select {
+	margin: 5px;
+}
+button {
+	margin: 5px;
+	width: 150px;
+}
+</style>
+
+<title>MSDroid Log Viewer</title>
+ 
+</head>
+<body>
+
+<h1>MSDroid Log Viewer</h1>
+
+<section>
+<div id='headings'>
+		<div>
+			Select a text file: 
+			<input type="file" id="fileInput">
+		</div>
+<h2 id='CaptureDate'></h2>		
+</div>
+<div id='controls'>
+	<select class='seriesSelect' id='s1'></select>
+	<select class='seriesSelect' id='s2'></select>
+	<select class='seriesSelect' id='s3'></select>
+</div>
+<div id='controlscontrol'>
+	<button id="addSeriesBtn" onclick="addSeries()">Add Data Line</button>
+	<br />
+	<button id="removeSeriesBtn" onclick="removeSeries()">Remove Data Line</button>
+</div>
+</section>
+<div id ='chartDiv'></div>
+<div id="mapid"></div>
+</body>
+
+
+
+<script type="text/javascript">
+function numSeries() {
+	return document.querySelectorAll('.seriesSelect').length
+}
+
+function addSeries() {
+	if(numSeries() < 5) {
+		var controls=document.getElementById('controls')
+		var select=document.createElement('select')
+		select.className='seriesSelect';
+		select.addEventListener('change',resetChart)
+		setOptions(select,ui["dataSeries"]["headers"])
+		controls.appendChild(select)
+		resetChart()
+
+	}
+}
+function removeSeries() {
+	if(numSeries() > 2) {
+		var selectors=document.querySelectorAll('.seriesSelect');
+		var toDie=selectors[selectors.length-1]
+		toDie.parentNode.removeChild(toDie)		
+		resetChart()
+	}
+}
+window.onload = function() {
+		var fileInput = document.getElementById('fileInput');
+		var fileDisplayArea = document.getElementById('fileDisplayArea');
+
+		fileInput.addEventListener('change', function(e) {
+			var file = fileInput.files[0];
+			console.log(file)
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				processData(reader.result);
+				setupSelectors()
+				setOptionDefaults("RPM","CLT","MAT")
+				resetChart()
+			}
+			reader.readAsText(file);	
+		});
+}
+function setupSelectors() {
+	var selects = document.querySelectorAll('.seriesSelect')
+	for(var i=0;i<selects.length;i++){
+		selects[i].addEventListener('change',resetChart)
+		setOptions(selects[i],ui["dataSeries"]["headers"])
+	}
+}
+
+function processData(data) {
+	var lines = data.split('\n');
+	var header=lines.splice(0,2);
+	setCaptureDate(header[1])
+	var dataSeries = createSeries(lines)
+
+	var latitudes=dataSeries["Latitude"]
+	var longitudes=dataSeries["Longitude"]
+	ui=createMapAndMarker(latitudes[0],longitudes[0])
+	ui["lat"]=latitudes
+	ui["lon"]=longitudes
+	ui["dataSeries"]=dataSeries
+}
+
+
+function setCaptureDate(dte) {
+	dte=dte.replace(/['"]+/g, '')
+	document.getElementById('CaptureDate').innerText=dte;
+}
+
+function createSeries(data) {
+	var series= {};
+	headers=data[0].split('\t')
+	//console.log(headers)
+	for(var i = 0;i<headers.length;i++) {
+		series[headers[i]]=[];
+	}
+
+	for (var i = 1 ; i < data.length;i++) {
+		var values=data[i].split('\t')
+		for (var j=0;j<values.length;j++) {
+			series[headers[j]].push(Number(values[j]))
+		}
+	}
+	series["headers"]=headers
+	return series
+}
+
+function setOptions(select,list) {
+	while (select.options.length > 0) {
+        select.remove(select.options.length - 1);
+    }
+    for(var i=0;i<list.length;i++) {
+    	var opt = document.createElement('option');
+
+        opt.text = list[i];
+        opt.value = list[i];
+
+        select.add(opt, null);
+    }
+}
+function setOptionDefaults() {
+	var selects = document.querySelectorAll('.seriesSelect')
+	for(var i=0; i< selects.length && i < arguments.length;i++) {
+		selects[i].value = arguments[i]
+	}
+}
+
+function resetChart(e){
+	console.log('In reset')
+	console.log(e)
+	var dataSeries=ui["dataSeries"]
+	var xaxis=dataSeries["Time"]
+
+	var s1 = document.getElementById('s1')
+	var s2 = document.getElementById('s2')
+	var series1=dataSeries[s1.value]
+	var series2=dataSeries[s2.value]
+	var selects = document.querySelectorAll('.seriesSelect')
+	var numSelects=selects.length
+	var series=[]
+	for(var i=0;i<numSelects;i++){
+		var serial={}
+		serial["values"]=dataSeries[selects[i].value]
+		serial["text"]=selects[i].value
+		var scale="scale-x,scale-y"
+		if(i>0) {
+			scale=scale+"-"+(i+1)
+		}
+		serial["scales"]=scale
+		series.push(serial)
+	}
+
+	var chartData={
+	 	"crosshair-x":{},
+	    "type":"line",  
+	    "series":series,
+	    "scroll-x":{},
+		"scale-x":{"labels":xaxis,"zooming":true}
+	};
+	for(var i=0;i<numSelects;i++){
+		var name="scale-y"
+		if(i>0) {
+			name=name+"-"+(i+1)
+		}
+		chartData[name]={"label":{"text":selects[i].value}}
+		//"placement":"opposite"
+		if(i % 2 == 0){
+			chartData[name]["placement"]="opposite";
+		}
+		else {
+			chartData[name]["placement"]="default";	
+		}
+	}
+	console.log(chartData)
+	showChart(chartData)
+}
+function showChart(chartData) {
+	zingchart.render({ 
+	    id:'chartDiv',
+	    data:chartData,
+	    height:"100%",
+	    width:"100%"
+	});
+	
+	zingchart.guide_mousemove = updateMap
+}
+function updateMap(p) {
+    var index=(p["items"][0]["nodeindex"])
+    var lat=ui["lat"][index]
+    var lon=ui["lon"][index]
+    ui["map"].setView([lat,lon])
+    ui["marker"].setLatLng([lat,lon])
+
+}
+function createMapAndMarker(lat,lon){
+
+	var map = L.map('mapid').setView([lat, lon], 16);
+
+	L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+	    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+	}).addTo(map);
+	var marker=L.marker([lat,lon]).addTo(map)
+	return {"marker":marker,"map":map};
+
+}
+
+
+</script>
+
+</html>
