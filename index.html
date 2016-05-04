@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
-<script src="http://cdn.zingchart.com/zingchart.min.js"></script>
-<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+<meta name=viewport content="width=device-width, initial-scale=1">
+<script async src="http://cdn.zingchart.com/zingchart.min.js"></script>
+<script async src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
 <style>
 #mapid { height: 480px; }
 body {font-size:75%;color:#222;background:#fff;font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;}
@@ -268,5 +268,21 @@ function createMapAndMarker(lat,lon){
   ga('create', 'UA-77194266-1', 'auto');
   ga('send', 'pageview');
 
+</script>
+<noscript id="deferred-styles">
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+</noscript>
+<script>
+  var loadDeferredStyles = function() {
+    var addStylesNode = document.getElementById("deferred-styles");
+    var replacement = document.createElement("div");
+    replacement.innerHTML = addStylesNode.textContent;
+    document.body.appendChild(replacement)
+    addStylesNode.parentElement.removeChild(addStylesNode);
+  };
+  var raf = requestAnimationFrame || mozRequestAnimationFrame ||
+      webkitRequestAnimationFrame || msRequestAnimationFrame;
+  if (raf) raf(function() { window.setTimeout(loadDeferredStyles, 0); });
+  else window.addEventListener('load', loadDeferredStyles);
 </script>
 </html>
