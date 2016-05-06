@@ -5,51 +5,51 @@
 <script async src="js/zingchart.min.js"></script>
 <script async src="js/leaflet.js"></script>
 <style>
-#mapid { height: 480px; }
-body {font-size:75%;color:#222;background:#fff;font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;}
-section {
-    height: 100px;
-    margin: auto;
-    padding: 10px;
-}
-div#headings {
-    width: 60%;
-    height: 100%;
-    float: left;
-}
-div#controls {
-    float:left;
-    height: 100%;
-    width:20%;
-}
-div#controlscontrol {
-	float:left;
-	height: 100%;
-	width:20%;
-}
-select {
-	margin: 5px;
-}
-button {
-	margin: 5px;
-	width: 80%;
-}
+	#mapid { height: 480px; }
+	body {font-size:75%;color:#222;background:#fff;font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;}
+	section {
+	    height: 100px;
+	    margin: auto;
+	    padding: 10px;
+	}
+	div#headings {
+	    width: 60%;
+	    height: 100%;
+	    float: left;
+	}
+	div#controls {
+	    float:left;
+	    height: 100%;
+	    width:20%;
+	}
+	div#controlscontrol {
+		float:left;
+		height: 100%;
+		width:20%;
+	}
+	select {
+		margin: 5px;
+	}
+	button {
+		margin: 5px;
+		width: 80%;
+	}
 </style>
 
 <title>MSDroid Log Viewer</title>
- 
-</head>
+ </head>
+
 <body>
 
 <h1>MSDroid Log Viewer</h1>
 
 <section>
 <div id='headings'>
-		<div>
-			Select a text file: 
-			<input type="file" id="fileInput">
-		</div>
-<h2 id='CaptureDate'></h2>		
+	<div>
+		Select a text file: 
+		<input type="file" id="fileInput">
+	</div>
+	<h2 id='CaptureDate'></h2>		
 </div>
 <div id='controls'>
 	<select class='seriesSelect' id='s1'></select>
@@ -62,8 +62,8 @@ button {
 	<button id="removeSeriesBtn" onclick="removeSeries()">Remove Data Line</button>
 </div>
 </section>
-<div id ='chartDiv'></div>
-<div id="mapid"></div>
+	<div id ='chartDiv'></div>
+	<div id="mapid"></div>
 </body>
 
 
@@ -93,6 +93,7 @@ function removeSeries() {
 		resetChart()
 	}
 }
+
 window.onload = function() {
 		var fileInput = document.getElementById('fileInput');
 		var fileDisplayArea = document.getElementById('fileDisplayArea');
@@ -182,10 +183,6 @@ function resetChart(e){
 	var dataSeries=ui["dataSeries"]
 	var xaxis=dataSeries["Time"]
 
-	var s1 = document.getElementById('s1')
-	var s2 = document.getElementById('s2')
-	var series1=dataSeries[s1.value]
-	var series2=dataSeries[s2.value]
 	var selects = document.querySelectorAll('.seriesSelect')
 	var numSelects=selects.length
 	var series=[]
