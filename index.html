@@ -144,7 +144,6 @@ function setCaptureDate(dte) {
 function createSeries(data) {
 	var series= {};
 	headers=data[0].split('\t')
-	//console.log(headers)
 	for(var i = 0;i<headers.length;i++) {
 		series[headers[i]]=[];
 	}
@@ -180,8 +179,6 @@ function setOptionDefaults() {
 }
 
 function resetChart(e){
-	console.log('In reset')
-	console.log(e)
 	var dataSeries=ui["dataSeries"]
 	var xaxis=dataSeries["Time"]
 
@@ -221,7 +218,6 @@ function resetChart(e){
 			chartData[name]["placement"]="default";	
 		}
 	}
-	console.log(chartData)
 	showChart(chartData)
 }
 function showChart(chartData) {
