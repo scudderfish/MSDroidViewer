@@ -11,6 +11,7 @@
 	    height: 100px;
 	    margin: auto;
 	    padding: 10px;
+	    border:1px solid black;
 	}
 	div#headings {
 	    width: 60%;
@@ -43,11 +44,13 @@
 
 <h1>MSDroid Log Viewer</h1>
 
-<section>
+<section id="dropTarget" ondrop="drop(event)" ondragover="allowDrop(event)">
 <div id='headings'>
-	<div>
-		Select a text file: 
+	<div >
+		
+		Select a text file or just drop one here: 
 		<input type="file" id="fileInput">
+		
 	</div>
 	<h2 id='CaptureDate'></h2>		
 </div>
@@ -69,6 +72,26 @@
 
 
 <script type="text/javascript">
+
+
+
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+    ev.preventDefault();
+
+	var dt    = ev.dataTransfer;
+  	var files = dt.files;
+   	loadFile(files[0])
+}
+
+
 function numSeries() {
 	return document.querySelectorAll('.seriesSelect').length
 }
@@ -94,14 +117,14 @@ function removeSeries() {
 	}
 }
 function loadFile(file){
-			var reader = new FileReader();
-			reader.onload = function(e) {
-				processData(reader.result);
-				setupSelectors()
-				setOptionDefaults("RPM","CLT","MAT")
-				resetChart()
-			}
-			reader.readAsText(file);	
+	var reader = new FileReader();
+	reader.onload = function(e) {
+		processData(reader.result);
+		setupSelectors()
+		setOptionDefaults("RPM","CLT","MAT")
+		resetChart()
+	}
+	reader.readAsText(file);	
 
 }
 window.onload = function() {
@@ -130,7 +153,7 @@ function processData(data) {
 	var latitudes=dataSeries["Latitude"]
 	var longitudes=dataSeries["Longitude"]
 	if(document.querySelectorAll('#mapid.leaflet-container').length==0){
-	ui=createMapAndMarker(latitudes[0],longitudes[0])
+		ui=createMapAndMarker(latitudes[0],longitudes[0])
 	}
 	ui["lat"]=latitudes
 	ui["lon"]=longitudes
