@@ -127,7 +127,9 @@ function processData(data) {
 
 	var latitudes=dataSeries["Latitude"]
 	var longitudes=dataSeries["Longitude"]
+	if(document.querySelectorAll('#mapid.leaflet-container').length==0){
 	ui=createMapAndMarker(latitudes[0],longitudes[0])
+	}
 	ui["lat"]=latitudes
 	ui["lon"]=longitudes
 	ui["dataSeries"]=dataSeries
